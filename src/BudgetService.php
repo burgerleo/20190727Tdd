@@ -20,6 +20,9 @@ class BudgetService
             return $budgetRepository[$startData->format('Ym')]/$startData->format('t');
         }
 
+        if($startData->format('Ymd') > $endData->format('Ymd')){
+            return 0;
+        }
 
         return $budgetRepository;
     }

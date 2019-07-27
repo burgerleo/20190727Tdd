@@ -28,21 +28,39 @@ class BudgetServiceTest extends TestCase
 
     public function test_query_Single_Day()
     {
+        $datebudget = [
+            '201901' => 3100,
+            '201902' => 2800,
+        ];
+
         $expected = 100;
         $start = new \DateTime('20190201');
         $end = new \DateTime('20190201');
-        $this->giveGetAll();
+        $this->giveGetAll($datebudget);
         $result = $this->budgetService->query($start, $end);
         $this->assertEquals($expected, $result);
     }
 
-    private function giveGetAll()
+    /**
+     * @test
+     */
+    public function query_start_after_end()
     {
         $datebudget = [
             '201901' => 3100,
             '201902' => 2800,
         ];
 
+        $expected = 0;
+        $end = new \DateTime('20190101');
+        $start = new \DateTime('20190201');
+        $this->giveGetAll($datebudget);
+        $result = $this->budgetService->query($start, $end);
+        $this->assertEquals($expected, $result);
+    }
+
+    private function giveGetAll($datebudget)
+    {
         $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($datebudget);
     }
 }
