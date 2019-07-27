@@ -12,55 +12,42 @@ class BudgetService
         $this->budgetRepository = $budgetRepository;
     }
 
-    public function query($startData, $endData)
+    public function query($startDate, $endDate)
     {
         // 起晚於訖
-        if ($startData->format('Ymd') > $endData->format('Ymd')) {
+        if ($startDate->format('Ymd') > $endDate->format('Ymd')) {
             return 0;
         }
 
-        $budget = $this->getStartDateValidBudget($startData)
-         + $this->getMonthBugdget($endData, $endData->format('d'));
+        $diffMonths = 0;
+        
+        // 如果年月相同可忽落此計算
+        // 開頭月有效Budget + 結尾月有效Budget
+        $budget = $this->getStartDateValidBudget($startDate) + $this->getEndDateValidBudget($endDate);
 
-        if ($startData->format('Y') === $endData->format('Y')) {
-            if ($startData->format('Ym') === $endData->format('Ym')) {
-                $days = $endData->format('d') - $startData->format('d') + 1;
+        if ($startDate->format('Y') === $endDate->format('Y')) {
+            if ($startDate->format('Ym') === $endDate->format('Ym')) {
 
-                return $this->getDailyBudget($startData) * $days;
+                //計算同年內差幾個月
+                $days = $endDate->format('d') - $startDate->format('d') + 1;
+
+                return $this->getMonthValidBugdget($startDate, $days);
             } else {
-
-                $diffMonth = $endData->format('m') - $startData->format('m') - 1;
-
-                for ($i = 0; $i < $diffMonth; $i++) {
-                    $budget += $this->getMonth($startData->modify("-" . ($startData->format('d') - 1) . " days")->modify("+1 month"));
-                }
-
-                return $budget;
-
+                //計算同年內差幾個月
+                $diffMonths += $endDate->format('m') - $startDate->format('m') - 1;
             }
-        }
-        //計算差幾年
-        $diffYear = $endData->format('Y') - $startData->format('Y') - 1;
+        } else {
+            //計算差幾年共幾個月
+            $diffMonths += ($endDate->format('Y') - $startDate->format('Y') - 1) * 12;
 
-        for ($i = 1; $i <= $diffYear; $i++) {
-            $yearMonth = $startData->format('Y') + $i;
+            // 計算離年底還有幾個月
+            $diffMonths += (12 - $startDate->format('m'));
 
-            $year = new DateTime($yearMonth . '0101');
-
-            $budget += $this->getYearBugdget($year);
-        }
-
-        $diffStartMonth = 12 - $startData->format('m');
-
-        for ($i = 0; $i < $diffStartMonth; $i++) {
-            $budget += $this->getMonth($startData->modify("-" . ($startData->format('d') - 1) . " days")->modify("+1 month"));
+            // 計算離年初還有幾個月
+            $diffMonths += ($endDate->format('m') - 1);
         }
 
-        $diffEndMonth = $endData->format('m') - 1;
-
-        for ($i = 0; $i < $diffEndMonth; $i++) {
-            $budget += $this->getMonth($startData->modify("-" . ($startData->format('d') - 1) . " days")->modify("+1 month"));
-        }
+        $budget += $this->getDiffMonthBudget($startDate, $diffMonths);
 
         return $budget;
     }
@@ -73,33 +60,45 @@ class BudgetService
     }
 
     /**
-     * @param $startData
+     * @param $startDate
      * @return float|int
      */
-    private function getDailyBudget(DateTime $date)
+    private function getDailyBudget(DateTime $date): int
     {
-        return $this->getMonth($date) / $date->format('t');
+        return floor($this->getMonth($date) / $date->format('t'));
     }
 
-    private function getMonthBugdget(DateTime $date, int $days)
+    private function getMonthValidBugdget(DateTime $date, int $days): int
     {
         return $this->getDailyBudget($date) * $days;
     }
 
-    private function getStartDateValidBudget(DateTime $startData)
+    private function getStartDateValidBudget(DateTime $startDate): int
     {
-        $diffStartdays = $startData->format('t') - $startData->format('d') + 1;
+        $diffStartdays = $startDate->format('t') - $startDate->format('d') + 1;
 
-        return $this->getMonthBugdget($startData, $diffStartdays);
+        return $this->getMonthValidBugdget($startDate, $diffStartdays);
     }
 
-    private function getYearBugdget(DateTime $date)
+    private function getEndDateValidBudget(DateTime $endDate): int
+    {
+        $diffEndDays = $endDate->format('d');
+
+        return $this->getMonthValidBugdget($endDate, $diffEndDays);
+    }
+
+    private function getDiffMonthBudget(DateTime $startDate, int $months): int
     {
         $budget = 0;
-        for ($x = 0; $x < 12; $x++) {
-            $end = $date->modify("+$x month");
+
+        $startMonth = new DateTime($startDate->format('Ym') . '01');
+
+        for ($i = 1; $i <= $months; $i++) {
+            $end = $startMonth->modify("+$i month");
+
             $budget += $this->getMonth($end);
         }
+
         return $budget;
     }
 }

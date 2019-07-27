@@ -169,10 +169,10 @@ class BudgetServiceTest extends TestCase
             '202001' => 3100,
         ];
 
-        $expected = 3300;
+        $expected = 3500;
 
-        $start = new DateTime('20181231');
-        $end = new DateTime('20200101');
+        $start = new DateTime('20181230');
+        $end = new DateTime('20200102');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
