@@ -103,14 +103,14 @@ class BudgetServiceTest extends TestCase
     public function test_query_cross_months()
     {
         $dateBudget = [
-            '201901' => 3100,
-            '201902' => 2800,
+            '202002' => 2900,
+            '202003' => 3100,
         ];
 
-        $expected = 700;
+        $expected = 1000;
 
-        $start = new \DateTime('20190130');
-        $end = new \DateTime('20190205');
+        $start = new \DateTime('20200221');
+        $end = new \DateTime('20200301');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -132,6 +132,48 @@ class BudgetServiceTest extends TestCase
 
         $start = new \DateTime('20190130');
         $end = new \DateTime('20190305');
+
+        $this->giveGetAll($dateBudget);
+        $result = $this->budgetService->query($start, $end);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function query_cross_year()
+    {
+        $dateBudget = [
+            '201812' => 3100,
+            '201901' => 3100,
+            '201902' => 2800
+        ];
+
+        $expected = 3300;
+
+        $start = new \DateTime('20181231');
+        $end = new \DateTime('20190201');
+
+        $this->giveGetAll($dateBudget);
+        $result = $this->budgetService->query($start, $end);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function query_cross_2year()
+    {
+        $dateBudget = [
+            '201812' => 3100,
+            '201901' => 3100,
+            '202001' => 3100
+        ];
+
+        $expected = 3300;
+
+        $start = new \DateTime('20181231');
+        $end = new \DateTime('20200101');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
