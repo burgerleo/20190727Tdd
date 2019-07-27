@@ -15,14 +15,24 @@ class BudgetService
     {
         $budgetRepository = $this->budgetRepository->getAll();
 
-        if ($startData->format('Ymd') === $endData->format('Ymd')) {
-
-            return $budgetRepository[$startData->format('Ym')]/$startData->format('t');
-        }
-
+        // 起晚於訖
         if($startData->format('Ymd') > $endData->format('Ymd')){
             return 0;
         }
+
+
+
+        if ($startData->format('Ym') === $endData->format('Ym')) {
+            return $budgetRepository[$startData->format('Ym')]  / $startData->format('t') * ($endData->format('d') - $startData->format('d') + 1);
+        }
+
+        if ($startData->format('Ymd') === $endData->format('Ymd')) {
+
+            return $budgetRepository[$startData->format('Ym')] / $startData->format('t');
+        }
+
+
+
 
         return $budgetRepository;
     }
