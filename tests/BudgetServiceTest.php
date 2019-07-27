@@ -10,6 +10,7 @@ namespace Tests;
 
 use App\BudgetService;
 use App\Repositories\BudgetRepository;
+use DateTime;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -34,8 +35,8 @@ class BudgetServiceTest extends TestCase
         ];
 
         $expected = 100;
-        $start = new \DateTime('20190201');
-        $end = new \DateTime('20190201');
+        $start = new DateTime('20190201');
+        $end = new DateTime('20190201');
         $this->giveGetAll($datebudget);
         $result = $this->budgetService->query($start, $end);
         $this->assertEquals($expected, $result);
@@ -52,8 +53,8 @@ class BudgetServiceTest extends TestCase
         ];
 
         $expected = 0;
-        $end = new \DateTime('20190101');
-        $start = new \DateTime('20190201');
+        $end = new DateTime('20190101');
+        $start = new DateTime('20190201');
         $this->giveGetAll($datebudget);
         $result = $this->budgetService->query($start, $end);
         $this->assertEquals($expected, $result);
@@ -69,9 +70,8 @@ class BudgetServiceTest extends TestCase
         ];
 
         $expected = 3100;
-        $start = new \DateTime('20190101');
-        $end = new \DateTime('20190131');
-
+        $start = new DateTime('20190101');
+        $end = new DateTime('20190131');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -88,9 +88,8 @@ class BudgetServiceTest extends TestCase
         ];
 
         $expected = 1000;
-        $start = new \DateTime('20190101');
-        $end = new \DateTime('20190110');
-
+        $start = new DateTime('20190101');
+        $end = new DateTime('20190110');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -109,8 +108,8 @@ class BudgetServiceTest extends TestCase
 
         $expected = 1000;
 
-        $start = new \DateTime('20200221');
-        $end = new \DateTime('20200301');
+        $start = new DateTime('20200221');
+        $end = new DateTime('20200301');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -125,13 +124,13 @@ class BudgetServiceTest extends TestCase
         $dateBudget = [
             '201901' => 3100,
             '201902' => 2800,
-            '201903' => 3100
+            '201903' => 3100,
         ];
 
         $expected = 3500;
 
-        $start = new \DateTime('20190130');
-        $end = new \DateTime('20190305');
+        $start = new DateTime('20190130');
+        $end = new DateTime('20190305');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -146,13 +145,13 @@ class BudgetServiceTest extends TestCase
         $dateBudget = [
             '201812' => 3100,
             '201901' => 3100,
-            '201902' => 2800
+            '201902' => 2800,
         ];
 
         $expected = 3300;
 
-        $start = new \DateTime('20181231');
-        $end = new \DateTime('20190201');
+        $start = new DateTime('20181231');
+        $end = new DateTime('20190201');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
@@ -167,13 +166,13 @@ class BudgetServiceTest extends TestCase
         $dateBudget = [
             '201812' => 3100,
             '201901' => 3100,
-            '202001' => 3100
+            '202001' => 3100,
         ];
 
         $expected = 3300;
 
-        $start = new \DateTime('20181231');
-        $end = new \DateTime('20200101');
+        $start = new DateTime('20181231');
+        $end = new DateTime('20200101');
 
         $this->giveGetAll($dateBudget);
         $result = $this->budgetService->query($start, $end);
