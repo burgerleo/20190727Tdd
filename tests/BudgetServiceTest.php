@@ -97,7 +97,6 @@ class BudgetServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-
     private function giveGetAll($datebudget)
     {
         $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($datebudget);

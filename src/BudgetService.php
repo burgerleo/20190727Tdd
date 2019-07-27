@@ -13,27 +13,33 @@ class BudgetService
 
     public function query($startData, $endData)
     {
-        $budgetRepository = $this->budgetRepository->getAll();
-
         // 起晚於訖
         if($startData->format('Ymd') > $endData->format('Ymd')){
             return 0;
         }
 
-
-
         if ($startData->format('Ym') === $endData->format('Ym')) {
-            return $budgetRepository[$startData->format('Ym')]  / $startData->format('t') * ($endData->format('d') - $startData->format('d') + 1);
+            $days = $endData->format('d') - $startData->format('d') + 1;
+
+            return $this->getDailyBudget($startData) * $days;
         }
 
-        if ($startData->format('Ymd') === $endData->format('Ymd')) {
+        return '沒做拉';
+    }
 
-            return $budgetRepository[$startData->format('Ym')] / $startData->format('t');
-        }
+    public function getMonth($date): int
+    {
+        $budgetRepository = $this->budgetRepository->getAll();
 
+        return isset($budgetRepository[$date->format('Ym')])?$budgetRepository[$date->format('Ym')]:0;
+    }
 
-
-
-        return $budgetRepository;
+    /**
+     * @param $startData
+     * @return float|int
+     */
+    private function getDailyBudget($startData)
+    {
+        return $this->getMonth($startData) / $startData->format('t');
     }
 }
