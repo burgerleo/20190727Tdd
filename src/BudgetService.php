@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Repositories\BudgetRepository;
-
+use Carbon\Carbon;
 class BudgetService
 {
     public function __construct(BudgetRepository $budgetRepository)
@@ -24,10 +24,18 @@ class BudgetService
             return $this->getDailyBudget($startData) * $days;
         }else{
 
-            $diffMonth = $endData->format('m') - $startData->format('m') + 1;
+            $diffMonth = $endData->format('m') - $startData->format('m')-1;
 
             $diffStartdays = $startData->format('t') - $startData->format('d') + 1;
-            return $this->getDailyBudget($startData) * $diffStartdays + $this->getDailyBudget($endData) * $endData->format('d');
+            $budget = $this->getDailyBudget($startData) * $diffStartdays
+            + $this->getDailyBudget($endData) * $endData->format('d');
+
+            for($i = 0 ; $i < $diffMonth ; $i++){
+                $budget += $this->getMonth($startData->modify("-". ($startData->format('d')-1) ." days")->modify("+1 month"));
+            }
+
+
+            return $budget;
 
         }
 

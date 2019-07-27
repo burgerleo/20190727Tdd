@@ -117,6 +117,26 @@ class BudgetServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @test
+     */
+    public function test_query_cross_two_months()
+    {
+        $dateBudget = [
+            '201901' => 3100,
+            '201902' => 2800,
+            '201903' => 3100
+        ];
+
+        $expected = 3500;
+
+        $start = new \DateTime('20190130');
+        $end = new \DateTime('20190305');
+
+        $this->giveGetAll($dateBudget);
+        $result = $this->budgetService->query($start, $end);
+        $this->assertEquals($expected, $result);
+    }
 
     private function giveGetAll($datebudget)
     {
