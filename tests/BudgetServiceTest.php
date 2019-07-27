@@ -16,30 +16,40 @@ use PHPUnit\Framework\TestCase;
 
 class BudgetServiceTest extends TestCase
 {
-    protected $mockBudgetRepository;
-    protected $budgetService;
+    protected $mockBudgetRepository, $budgetService;
+    private $start, $end, $totalBudget;
 
     protected function setUp()
     {
         $this->mockBudgetRepository = m::mock(BudgetRepository::class);
 
         $this->budgetService = new BudgetService($this->mockBudgetRepository);
+    }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+        $this->mockBudgetRepository = null;
+        $this->budgetService = null;
+        $this->start = null;
+        $this->end = null;
+        $this->totalBudget = null;
     }
 
     public function test_query_Single_Day()
     {
-        $datebudget = [
+        $this->totalBudget = [
             '201901' => 3100,
             '201902' => 2800,
         ];
 
-        $expected = 100;
-        $start = new DateTime('20190201');
-        $end = new DateTime('20190201');
-        $this->giveGetAll($datebudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $start = '20190201';
+        $end = '20190201';
+
+        $expectedBudget = 100;
+
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -47,17 +57,18 @@ class BudgetServiceTest extends TestCase
      */
     public function query_start_after_end()
     {
-        $datebudget = [
+        $this->totalBudget = [
             '201901' => 3100,
             '201902' => 2800,
         ];
 
-        $expected = 0;
-        $end = new DateTime('20190101');
-        $start = new DateTime('20190201');
-        $this->giveGetAll($datebudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $start = '20190201';
+        $end = '20190101';
+
+        $expectedBudget = 0;
+
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -65,17 +76,17 @@ class BudgetServiceTest extends TestCase
      */
     public function test_query_single_whole_month()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '201901' => 3100,
         ];
 
-        $expected = 3100;
-        $start = new DateTime('20190101');
-        $end = new DateTime('20190131');
+        $start = '20190101';
+        $end = '20190131';
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $expectedBudget = 3100;
+
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -83,17 +94,17 @@ class BudgetServiceTest extends TestCase
      */
     public function test_query_partial_month()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '201901' => 3100,
         ];
 
-        $expected = 1000;
-        $start = new DateTime('20190101');
-        $end = new DateTime('20190110');
+        $start = '20190101';
+        $end = '20190110';
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $expectedBudget = 1000;
+
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -101,19 +112,18 @@ class BudgetServiceTest extends TestCase
      */
     public function test_query_cross_months()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '202002' => 2900,
             '202003' => 3100,
         ];
 
-        $expected = 1000;
+        $start = '20200221';
+        $end = '20200301';
 
-        $start = new DateTime('20200221');
-        $end = new DateTime('20200301');
+        $expectedBudget = 1000;
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -121,20 +131,19 @@ class BudgetServiceTest extends TestCase
      */
     public function test_query_cross_two_months()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '201901' => 3100,
             '201902' => 2800,
             '201903' => 3100,
         ];
 
-        $expected = 3500;
+        $start = '20190130';
+        $end = '20190305';
 
-        $start = new DateTime('20190130');
-        $end = new DateTime('20190305');
+        $expectedBudget = 3500;
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -142,20 +151,19 @@ class BudgetServiceTest extends TestCase
      */
     public function query_cross_year()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '201812' => 3100,
             '201901' => 3100,
             '201902' => 2800,
         ];
 
-        $expected = 3300;
+        $start = '20181231';
+        $end = '20190201';
 
-        $start = new DateTime('20181231');
-        $end = new DateTime('20190201');
+        $expectedBudget = 3300;
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
     }
 
     /**
@@ -163,24 +171,38 @@ class BudgetServiceTest extends TestCase
      */
     public function query_cross_2year()
     {
-        $dateBudget = [
+        $this->totalBudget = [
             '201812' => 3100,
             '201901' => 3100,
             '202001' => 3100,
         ];
 
-        $expected = 3500;
+        $start = '20181230';
+        $end = '20200102';
 
-        $start = new DateTime('20181230');
-        $end = new DateTime('20200102');
+        $expectedBudget = 3500;
 
-        $this->giveGetAll($dateBudget);
-        $result = $this->budgetService->query($start, $end);
+        $this->giveStartDateAndEndDate($start, $end);
+        $this->budgetShouldBe($expectedBudget);
+    }
+
+    private function giveGetAll()
+    {
+        $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($this->totalBudget);
+    }
+
+    private function giveStartDateAndEndDate($start, $end)
+    {
+        $this->start = new DateTime($start);
+        $this->end = new DateTime($end);
+    }
+
+    private function budgetShouldBe(string $expected)
+    {
+        $this->giveGetAll();
+
+        $result = $this->budgetService->query($this->start, $this->end);
         $this->assertEquals($expected, $result);
     }
 
-    private function giveGetAll($datebudget)
-    {
-        $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($datebudget);
-    }
 }
