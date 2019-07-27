@@ -10,53 +10,76 @@ namespace App;
 
 class Tennis
 {
-    public $game = [];
-    public $scoreNmae = [
+    private $firstPlayerName;
+    
+    private $secondPlayerName;
+
+    private $firstPlayerScoreTimes = 0;
+    
+    private $secondPlayerScoreTimes = 0;
+
+    private $scoreLookup = [
         0 => 'Love',
         1 => 'Fiten',
         2 => 'Thirty',
         3 => 'Forty',
     ];
 
-    public function __construct(string $player1, string $player2)
+    public function __construct(string $firstPlayerName, string $secondPlayerName)
     {
-        $this->player1 = $player1;
-        $this->player2 = $player2;
-        $this->player1Score = 0;
-        $this->player2Score = 0;
+        $this->firstPlayerName = $firstPlayerName;
+        $this->secondPlayerName = $secondPlayerName;
     }
 
     public function score()
     {
-        if($this->player1Score == $this->player2Score){
-            return $this->scoreNmae[$this->player1Score] . " " . $this->sameScore();
+        if($this->isScoreDofferent()){
+            if ($this->firstPlayerScoreTimes > 3 || $this->secondPlayerScoreTimes > 3) {
+
+                if($this->firstPlayerScoreTimes > $this->secondPlayerScoreTimes && abs($this->firstPlayerScoreTimes-$this->secondPlayerScoreTimes)==1){
+                    return $this->firstPlayerName . " Adv";
+                }else if ($this->firstPlayerScoreTimes < $this->secondPlayerScoreTimes && abs($this->firstPlayerScoreTimes-$this->secondPlayerScoreTimes)==1){
+                    return $this->secondPlayerName . " Adv";
+                }
+            }else{
+                return $this->lookupScore();
+            }
         }
 
-        if ($score1 == $souce2){
-            return $this->scoreNmae[$score1] . 'All';
+        if($this->sameScore()){
+            if ($this->firstPlayerScoreTimes >= 3){
+                return "Deuce";
+            }else{
+                return $this->scoreLookup[$this->firstPlayerScoreTimes] ." All";
+            }
         }
 
-        return ;
+        return "Love All";
     }
 
     public function sameScore()
     {
-        $score = abs($this->player1Score - $this->player2Score);
-
-        if ($score == 0){
-            return 'All';
-        }else if($score == 1){
-            return 'Adv';
-        }else{
-            return 'Win';
-
-        }
+        return $this->firstPlayerScoreTimes == $this->secondPlayerScoreTimes;
     }
 
-    public function goal(string $playerName, int $souce = 0)
+    private function isScoreDofferent()
     {
-        if (isset($this->game[$player])) {
-            ($souce == 0 )? $this->game[$player]++ : $this->game[$player] = $souce;
-        }
+        return $this->firstPlayerScoreTimes != $this->secondPlayerScoreTimes;
+    }
+
+    private function lookupScore()
+    {
+        return $this->scoreLookup[$this->firstPlayerScoreTimes] . " " . $this->scoreLookup[$this->secondPlayerScoreTimes];
+
+    }
+
+    public function firstPlayerScore()
+    {
+        $this->firstPlayerScoreTimes++;
+    }
+
+    public function secondPlayerScore()
+    {
+        $this->secondPlayerScoreTimes++;
     }
 }
