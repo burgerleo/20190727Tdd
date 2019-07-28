@@ -66,6 +66,14 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
+    public function test_Period_Overlap_Budget_Last_Day()
+    {
+        $budgetAmount = 1;
+        $this->giveStartDateAndEndDate('20190430', '20190501');
+        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->budgetShouldBe($budgetAmount);
+    }
+
     private function giveStartDateAndEndDate(string $start, string $end)
     {
         $this->start = new Carbon($start);

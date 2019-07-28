@@ -22,7 +22,6 @@ class BudgetService
             return 0;
         }
 
-
         $period = new Period($start, $end);
 
         $budget = $budgets[0];

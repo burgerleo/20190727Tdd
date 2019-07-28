@@ -47,7 +47,7 @@ class Budget
      */
     public function getFirstDay(): Carbon
     {
-        return $this->yearMonth->copy()->startOfDay();
+        return $this->yearMonth->startOfMonth();
     }
 
     /**
@@ -55,6 +55,6 @@ class Budget
      */
     public function getLastDay(): Carbon
     {
-        return $this->yearMonth->copy()->endOfDay();
+        return $this->yearMonth->endOfMonth();
     }
 }

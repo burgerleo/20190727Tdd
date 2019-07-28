@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Module\Budget;
 use Carbon\Carbon;
 
 class Period
@@ -37,7 +38,7 @@ class Period
         return $this->end;
     }
 
-    public function overlapDays($budget)
+    public function overlapDays(Budget $budget)
     {
         if($this->start > $budget->getLastDay()){
             return 0;
@@ -53,7 +54,12 @@ class Period
             $effectiveStart = $budget->getFirstDay();
         }
 
-        return $effectiveStart->diffInDays($this->end) + 1;
+        $effectiveEnd = $this->end;
+        if ($budget->getLastDay() < $this->end) {
+            $effectiveEnd = $budget->getLastDay();
+        }
+
+        return $effectiveStart->diffInDays($effectiveEnd) + 1;
     }
 
 }
