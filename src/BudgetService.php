@@ -27,7 +27,8 @@ class BudgetService
         $budget = $budgets[0];
 
         if ($end < $budget->getFirstDay()) {
-            print_r($budget->getFirstDay());
+            return 0;
+        }else if($start > $budget->getLastDay()){
             return 0;
         }
 

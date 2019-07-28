@@ -49,4 +49,12 @@ class Budget
     {
         return $this->yearMonth->copy()->startOfDay();
     }
+
+    /**
+     * @return mixed
+     */
+    public function getLastDay(): Carbon
+    {
+        return $this->yearMonth->copy()->endOfDay();
+    }
 }
