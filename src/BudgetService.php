@@ -7,13 +7,24 @@ use Carbon\Carbon;
 
 class BudgetService
 {
+    protected $budgetRepository;
+
     public function __construct(BudgetRepository $budgetRepository)
     {
         $this->budgetRepository = $budgetRepository;
     }
 
-    public function query(Carbon $startData, Carbon $endData)
+    public function query(Carbon $start, Carbon $end)
     {
-        return 0;
+        $budgets = $this->budgetRepository->getAll();
+
+        if (count($budgets) == 0) {
+            return 0;
+        }
+
+        $period = new Period($start, $end);
+
+        return $period->days($start, $end);
+
     }
 }

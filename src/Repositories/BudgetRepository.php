@@ -6,6 +6,6 @@ class BudgetRepository
 {
     public function getAll()
     {
-        return 0;
+        return ;
     }
 }

@@ -9,21 +9,22 @@
 namespace Tests;
 
 use App\BudgetService;
+use App\Module\Budget;
 use App\Repositories\BudgetRepository;
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Carbon\Carbon;
 
 class BudgetServiceTest extends TestCase
 {
-    protected $mockBudgetRepository;
+    protected $stubRepository;
     protected $budgetService;
 
     protected function setUp()
     {
-        $this->mockBudgetRepository = m::spy(BudgetRepository::class);
+        $this->stubRepository = m::spy(BudgetRepository::class);
 
-        $this->budgetService = new BudgetService($this->mockBudgetRepository);
+        $this->budgetService = new BudgetService($this->stubRepository);
     }
 
     public function test_query_No_OverLap()
@@ -33,10 +34,11 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
-    public function test_query_OverLap_One_Day()
+    public function test_period_inside_budget_month()
     {
         $budgetAmount = 1;
         $this->giveStartDateAndEndDate('20190402', '20190402');
+        $this->givenBudgets(array(new Budget('201004', 30)));
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -51,5 +53,9 @@ class BudgetServiceTest extends TestCase
         $this->assertEquals($budgetAmount, $this->budgetService->query($this->start, $this->end));
     }
 
+    private function givenBudgets($budgets): void
+    {
+        $this->stubRepository->shouldReceive('getAll')->andReturn($budgets);
+    }
 
 }
