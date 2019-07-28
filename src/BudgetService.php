@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Repositories\BudgetRepository;
-use DateTime;
+use Carbon\Carbon;
 
 class BudgetService
 {
@@ -12,91 +12,49 @@ class BudgetService
         $this->budgetRepository = $budgetRepository;
     }
 
-    public function query($startDate, $endDate)
+    public function query(Carbon $startDate, Carbon $endDate)
     {
         // 起晚於訖
         if ($startDate->format('Ymd') > $endDate->format('Ymd')) {
             return 0;
         }
 
-        $diffMonths = 0;
-        
-        // 如果年月相同可忽落此計算
-        // 開頭月有效Budget + 結尾月有效Budget
-        $budget = $this->getStartDateValidBudget($startDate) + $this->getEndDateValidBudget($endDate);
+        if ($startDate->format('Ym') === $endDate->format('Ym')) {
 
-        if ($startDate->format('Y') === $endDate->format('Y')) {
-            if ($startDate->format('Ym') === $endDate->format('Ym')) {
-
-                //計算同年內差幾個月
-                $days = $endDate->format('d') - $startDate->format('d') + 1;
-
-                return $this->getMonthValidBugdget($startDate, $days);
-            } else {
-                //計算同年內差幾個月
-                $diffMonths += $endDate->format('m') - $startDate->format('m') - 1;
-            }
-        } else {
-            //計算差幾年共幾個月
-            $diffMonths += ($endDate->format('Y') - $startDate->format('Y') - 1) * 12;
-
-            // 計算離年底還有幾個月
-            $diffMonths += (12 - $startDate->format('m'));
-
-            // 計算離年初還有幾個月
-            $diffMonths += ($endDate->format('m') - 1);
+            return $this->budgetRepository->getMonthValidBugdget($startDate, ($endDate->day - $startDate->day + 1));
         }
 
-        $budget += $this->getDiffMonthBudget($startDate, $diffMonths);
+        $budget = $this->getDiffMonthBudget($startDate, $endDate);
 
         return $budget;
     }
 
-    private function getMonth(DateTime $date): int
+    private function getStartDateValidBudget(Carbon $startDate): int
     {
-        $budgetRepository = $this->budgetRepository->getAll();
-
-        return isset($budgetRepository[$date->format('Ym')]) ? $budgetRepository[$date->format('Ym')] : 0;
+        return $this->budgetRepository->getMonthValidBugdget($startDate, $startDate->daysInMonth - $startDate->day + 1);
     }
 
-    /**
-     * @param $startDate
-     * @return float|int
-     */
-    private function getDailyBudget(DateTime $date): int
+    private function getEndDateValidBudget(Carbon $endDate): int
     {
-        return floor($this->getMonth($date) / $date->format('t'));
+        return $this->budgetRepository->getMonthValidBugdget($endDate, $endDate->day);
     }
 
-    private function getMonthValidBugdget(DateTime $date, int $days): int
-    {
-        return $this->getDailyBudget($date) * $days;
-    }
-
-    private function getStartDateValidBudget(DateTime $startDate): int
-    {
-        $diffStartdays = $startDate->format('t') - $startDate->format('d') + 1;
-
-        return $this->getMonthValidBugdget($startDate, $diffStartdays);
-    }
-
-    private function getEndDateValidBudget(DateTime $endDate): int
-    {
-        $diffEndDays = $endDate->format('d');
-
-        return $this->getMonthValidBugdget($endDate, $diffEndDays);
-    }
-
-    private function getDiffMonthBudget(DateTime $startDate, int $months): int
+    private function getDiffMonthBudget(Carbon $startDate, Carbon $endDate): int
     {
         $budget = 0;
 
-        $startMonth = new DateTime($startDate->format('Ym') . '01');
+        $months = $startDate->copy()->startOfMonth()->diffInMonths($endDate->copy()->endOfMonth()) + 1;
 
-        for ($i = 1; $i <= $months; $i++) {
-            $end = $startMonth->modify("+$i month");
+        for ($i = 0; $i <= $months; $i++) {
+            $midMonth = $startDate->copy()->startOfMonth()->addMonth($i);
 
-            $budget += $this->getMonth($end);
+            if ($startDate->format('Ym') == $midMonth->format('Ym')) {
+                $budget += $this->getStartDateValidBudget($startDate);
+            } else if ($endDate->format('Ym') == $midMonth->format('Ym')) {
+                $budget += $this->getEndDateValidBudget($endDate);
+            } else {
+                $budget += $this->budgetRepository->getMonthValidBugdget($midMonth, $midMonth->daysInMonth);
+            }
         }
 
         return $budget;

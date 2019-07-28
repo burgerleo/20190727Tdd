@@ -13,23 +13,23 @@ use App\Repositories\BudgetRepository;
 use DateTime;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-
+use Carbon\Carbon;
 class BudgetServiceTest extends TestCase
 {
-    protected $mockBudgetRepository, $budgetService;
+    protected $budgetRepository, $budgetService;
     private $start, $end, $totalBudget;
 
     protected function setUp()
     {
-        $this->mockBudgetRepository = m::mock(BudgetRepository::class);
+        $this->budgetRepository = new BudgetRepository();
 
-        $this->budgetService = new BudgetService($this->mockBudgetRepository);
+        $this->budgetService = new BudgetService($this->budgetRepository);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        $this->mockBudgetRepository = null;
+        $this->budgetRepository = null;
         $this->budgetService = null;
         $this->start = null;
         $this->end = null;
@@ -188,13 +188,13 @@ class BudgetServiceTest extends TestCase
 
     private function giveGetAll()
     {
-        $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($this->totalBudget);
+        $this->budgetRepository->budgetAll = $this->totalBudget;
     }
 
     private function giveStartDateAndEndDate($start, $end)
     {
-        $this->start = new DateTime($start);
-        $this->end = new DateTime($end);
+        $this->start = new Carbon($start);
+        $this->end = new Carbon($end);
     }
 
     private function budgetShouldBe(string $expected)
