@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Repositories\BudgetRepository;
+use Carbon\Carbon;
 
 class BudgetService
 {
@@ -11,16 +12,8 @@ class BudgetService
         $this->budgetRepository = $budgetRepository;
     }
 
-    public function query($startData, $endData)
+    public function query(Carbon $startData, Carbon $endData)
     {
-        $budgetRepository = $this->budgetRepository->getAll();
-
-        if ($startData->format('Ymd') === $endData->format('Ymd')) {
-
-            return $budgetRepository[$startData->format('Ym')]/$startData->format('t');
-        }
-
-
-        return $budgetRepository;
+        return 0;
     }
 }

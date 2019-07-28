@@ -12,6 +12,7 @@ use App\BudgetService;
 use App\Repositories\BudgetRepository;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Carbon\Carbon;
 
 class BudgetServiceTest extends TestCase
 {
@@ -20,29 +21,35 @@ class BudgetServiceTest extends TestCase
 
     protected function setUp()
     {
-        $this->mockBudgetRepository = m::mock(BudgetRepository::class);
+        $this->mockBudgetRepository = m::spy(BudgetRepository::class);
 
         $this->budgetService = new BudgetService($this->mockBudgetRepository);
-
     }
 
-    public function test_query_Single_Day()
+    public function test_query_No_OverLap()
     {
-        $expected = 100;
-        $start = new \DateTime('20190201');
-        $end = new \DateTime('20190201');
-        $this->giveGetAll();
-        $result = $this->budgetService->query($start, $end);
-        $this->assertEquals($expected, $result);
+        $budgetAmount = 0;
+        $this->giveStartDateAndEndDate('20190301', '20190303');
+        $this->budgetShouldBe($budgetAmount);
     }
 
-    private function giveGetAll()
+    public function test_query_OverLap_One_Day()
     {
-        $datebudget = [
-            '201901' => 3100,
-            '201902' => 2800,
-        ];
-
-        $this->mockBudgetRepository->shouldReceive('getAll')->andReturn($datebudget);
+        $budgetAmount = 1;
+        $this->giveStartDateAndEndDate('20190402', '20190402');
+        $this->budgetShouldBe($budgetAmount);
     }
+
+    private function giveStartDateAndEndDate(string $start, string $end)
+    {
+        $this->start = new Carbon($start);
+        $this->end = new Carbon($end);
+    }
+
+    private function budgetShouldBe(int $budgetAmount)
+    {
+        $this->assertEquals($budgetAmount, $this->budgetService->query($this->start, $this->end));
+    }
+
+
 }
