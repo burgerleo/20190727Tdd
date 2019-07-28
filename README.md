@@ -1,3 +1,5 @@
-# travis-ci [![Build Status](https://travis-ci.org/shengyou/travis-ci.svg?branch=master)](https://travis-ci.org/shengyou/travis-ci)
-sample php project for travis ci 
+# 20190727 ~ 20190728 TDD 與持續重構
 
+## Case1 Tennis
+
+## Case2 Budget Service
