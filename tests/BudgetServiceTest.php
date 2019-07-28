@@ -34,10 +34,18 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
-    public function test_period_inside_budget_month()
+    public function test_Period_Inside_Budget_Month()
     {
         $budgetAmount = 1;
         $this->giveStartDateAndEndDate('20190402', '20190402');
+        $this->givenBudgets(array(new Budget('201004', 30)));
+        $this->budgetShouldBe($budgetAmount);
+    }
+
+    public function test_Period_No_Overlap_Before_Budget_First_Month()
+    {
+        $budgetAmount = 0;
+        $this->giveStartDateAndEndDate('20190330', '20190331');
         $this->givenBudgets(array(new Budget('201004', 30)));
         $this->budgetShouldBe($budgetAmount);
     }

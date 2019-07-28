@@ -13,7 +13,8 @@ class Period
      */
     public function __construct(Carbon $start, Carbon $end)
     {
-
+        $this->start = $start;
+        $this->end = $end;
     }
 
     /**
@@ -23,6 +24,9 @@ class Period
      */
     public function days(Carbon $start, Carbon $end): int
     {
-        return $start->copy()->diffInDays($end->copy()) + 1;
+        return $this->start->diffInDays($this->end) + 1;
     }
+
+
+
 }

@@ -24,6 +24,13 @@ class BudgetService
 
         $period = new Period($start, $end);
 
+        $budget = $budgets[0];
+
+        if ($end < $budget->getFirstDay()) {
+            print_r($budget->getFirstDay());
+            return 0;
+        }
+
         return $period->days($start, $end);
 
     }
