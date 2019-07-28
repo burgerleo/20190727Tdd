@@ -22,17 +22,12 @@ class BudgetService
             return 0;
         }
 
+
         $period = new Period($start, $end);
 
         $budget = $budgets[0];
 
-        if ($end < $budget->getFirstDay()) {
-            return 0;
-        }else if($start > $budget->getLastDay()){
-            return 0;
-        }
-
-        return $period->days($start, $end);
+        return $period->overlapDays($budget);
 
     }
 }
