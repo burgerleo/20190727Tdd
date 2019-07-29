@@ -22,10 +22,12 @@ class BudgetService
             return 0;
         }
         $period = new Period($start, $end);
+        $totalBudget = 0;
+        foreach ($budgets as $budget){
+            $totalBudget += $period->overlapDays($budget);
+        }
 
-        $budget = $budgets[0];
-
-        return $period->overlapDays($budget);
+        return $totalBudget;
 
     }
 }

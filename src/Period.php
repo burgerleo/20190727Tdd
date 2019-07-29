@@ -40,11 +40,7 @@ class Period
 
     public function overlapDays(Budget $budget)
     {
-        if($this->start > $budget->getLastDay()){
-            return 0;
-        }
-
-        if ($this->end < $budget->getFirstDay()) {
+        if($this->start > $budget->getLastDay() || $this->end < $budget->getFirstDay()){
             return 0;
         }
 
