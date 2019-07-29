@@ -31,6 +31,7 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 0;
         $this->giveStartDateAndEndDate('20190301', '20190303');
+        $this->givenBudgets([]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -38,7 +39,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 1;
         $this->giveStartDateAndEndDate('20190401', '20190401');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -46,7 +49,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 0;
         $this->giveStartDateAndEndDate('20190330', '20190331');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -54,7 +59,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 0;
         $this->giveStartDateAndEndDate('20190501', '20190502');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -62,7 +69,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 1;
         $this->giveStartDateAndEndDate('20190331', '20190401');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -70,7 +79,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 1;
         $this->giveStartDateAndEndDate('20190430', '20190501');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -78,7 +89,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 30;
         $this->giveStartDateAndEndDate('20190331', '20190501');
-        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -86,7 +99,9 @@ class BudgetServiceTest extends TestCase
     {
         $budgetAmount = 30;
         $this->giveStartDateAndEndDate('20190403', '20190405');
-        $this->givenBudgets(array(new Budget('201904', 300)));
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 300],
+        ]);
         $this->budgetShouldBe($budgetAmount);
     }
 
@@ -95,9 +110,9 @@ class BudgetServiceTest extends TestCase
         $budgetAmount = 231;
         $this->giveStartDateAndEndDate('20190331', '20190501');
         $this->givenBudgets([
-            (new Budget('201903', 31)),
-            (new Budget('201904', 30)),
-            (new Budget('201905', 6200)),
+            ["yearMonth" => 201903, 'amount' => 31],
+            ["yearMonth" => 201904, 'amount' => 30],
+            ["yearMonth" => 201905, 'amount' => 6200],
         ]);
         $this->budgetShouldBe($budgetAmount);
     }
@@ -115,7 +130,12 @@ class BudgetServiceTest extends TestCase
 
     private function givenBudgets($budgets): void
     {
-        $this->stubRepository->shouldReceive('getAll')->andReturn($budgets);
+        $response = [];
+        foreach ($budgets as $budget){
+            $response[] = (new Budget($budget['yearMonth'], $budget['amount']));
+        }
+
+        $this->stubRepository->shouldReceive('getAll')->andReturn($response);
     }
 
 }

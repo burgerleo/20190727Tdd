@@ -38,24 +38,25 @@ class Period
         return $this->end;
     }
 
-    public function overlapDays(Budget $budget)
+    /**
+     * @param Budget $budget
+     * @return int
+     */
+    public function overlappingDays(Budget $budget)
     {
-        if($this->start > $budget->getLastDay() || $this->end < $budget->getFirstDay()){
+        if ($this->start > $budget->getLastDay() || $this->end < $budget->getFirstDay()) {
             return 0;
         }
 
-        $effectiveStart = $this->start;
+        $effectiveStart = ($budget->getFirstDay() > $this->start) ?
+        $budget->getFirstDay() :
+        $this->start;
 
-        if ($budget->getFirstDay() > $this->start) {
-            $effectiveStart = $budget->getFirstDay();
-        }
+        $effectiveEnd = ($budget->getLastDay() < $this->end) ?
+        $budget->getLastDay() :
+        $this->end;
 
-        $effectiveEnd = $this->end;
-        if ($budget->getLastDay() < $this->end) {
-            $effectiveEnd = $budget->getLastDay();
-        }
-
-        return ($effectiveStart->diffInDays($effectiveEnd) + 1) * $budget->getDailyAmount();
+        return $effectiveStart->diffInDays($effectiveEnd) + 1;
     }
 
 }

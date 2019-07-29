@@ -2,6 +2,7 @@
 
 namespace App\Module;
 
+use App\Period;
 use Carbon\Carbon;
 
 class Budget
@@ -27,11 +28,12 @@ class Budget
     }
 
     /**
-     * @return string
+     * @param Period $period
+     * @return float|int
      */
-    public function getYearMonth():string
+    public function getEffectiveDailyAmount(Period $period)
     {
-        return $this->yearMonth;
+        return $period->overlappingDays($this) * $this->getDailyAmount();
     }
 
     /**
@@ -39,7 +41,7 @@ class Budget
      */
     public function getDailyAmount(): int
     {
-        return $this->amount/$this->getMonthDays();
+        return $this->amount / $this->getMonthDays();
     }
 
     /**

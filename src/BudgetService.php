@@ -16,15 +16,12 @@ class BudgetService
 
     public function query(Carbon $start, Carbon $end)
     {
-        $budgets = $this->budgetRepository->getAll();
-
-        if (count($budgets) == 0) {
-            return 0;
-        }
         $period = new Period($start, $end);
+
         $totalBudget = 0;
-        foreach ($budgets as $budget){
-            $totalBudget += $period->overlapDays($budget);
+
+        foreach ($this->budgetRepository->getAll() as $budget) {
+            $totalBudget += $budget->getEffectiveDailyAmount($period);
         }
 
         return $totalBudget;
