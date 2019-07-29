@@ -74,6 +74,14 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
+    public function test_Period_Cross_Budget_Month()
+    {
+        $budgetAmount = 30;
+        $this->giveStartDateAndEndDate('20190331', '20190501');
+        $this->givenBudgets(array(new Budget('201904', 30)));
+        $this->budgetShouldBe($budgetAmount);
+    }
+
     private function giveStartDateAndEndDate(string $start, string $end)
     {
         $this->start = new Carbon($start);
