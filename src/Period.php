@@ -59,7 +59,7 @@ class Period
             $effectiveEnd = $budget->getLastDay();
         }
 
-        return $effectiveStart->diffInDays($effectiveEnd) + 1;
+        return ($effectiveStart->diffInDays($effectiveEnd) + 1) * $budget->getDailyAmount();
     }
 
 }

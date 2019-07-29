@@ -82,6 +82,14 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
+    public function test_Daily_Amount_Is_10_Money()
+    {
+        $budgetAmount = 30;
+        $this->giveStartDateAndEndDate('20190403', '20190405');
+        $this->givenBudgets(array(new Budget('201904', 300)));
+        $this->budgetShouldBe($budgetAmount);
+    }
+
     private function giveStartDateAndEndDate(string $start, string $end)
     {
         $this->start = new Carbon($start);
