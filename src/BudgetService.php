@@ -21,10 +21,9 @@ class BudgetService
         $totalBudget = 0;
 
         foreach ($this->budgetRepository->getAll() as $budget) {
-            $totalBudget += $budget->getEffectiveDailyAmount($period);
+            $totalBudget += $budget->getEffectiveAmount($period);
         }
 
         return $totalBudget;
-
     }
 }

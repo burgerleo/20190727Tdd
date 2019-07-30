@@ -18,12 +18,12 @@ class Budget
 
     /**
      * Budget constructor.
-     * @param string $yearMonth
+     * @param Carbon $yearMonth
      * @param int $amount
      */
-    public function __construct(string $yearMonth, int $amount)
+    public function __construct(Carbon $yearMonth, int $amount = 0)
     {
-        $this->yearMonth = new Carbon($yearMonth . '01');
+        $this->yearMonth = $yearMonth;
         $this->amount = $amount;
     }
 
@@ -31,15 +31,23 @@ class Budget
      * @param Period $period
      * @return float|int
      */
-    public function getEffectiveDailyAmount(Period $period)
+    public function getEffectiveAmount(Period $period)
     {
-        return $period->overlappingDays($this) * $this->getDailyAmount();
+        return $period->overlappingDays($this->createPeriod()) * $this->getDailyAmount();
+    }
+
+    /**
+     * @return Period
+     */
+    private function createPeriod(): Period
+    {
+        return new Period($this->getFirstDay(), $this->getLastDay());
     }
 
     /**
      * @return int
      */
-    public function getDailyAmount(): int
+    private function getDailyAmount(): int
     {
         return $this->amount / $this->getMonthDays();
     }
@@ -47,23 +55,23 @@ class Budget
     /**
      * @return int
      */
-    public function getMonthDays(): int
+    private function getMonthDays(): int
     {
         return $this->yearMonth->daysInMonth;
     }
 
     /**
-     * @return mixed
+     * @return Carbon
      */
-    public function getFirstDay(): Carbon
+    private function getFirstDay(): Carbon
     {
         return $this->yearMonth->copy()->startOfMonth();
     }
 
     /**
-     * @return mixed
+     * @return Carbon
      */
-    public function getLastDay(): Carbon
+    private function getLastDay(): Carbon
     {
         return $this->yearMonth->copy()->endOfMonth();
     }

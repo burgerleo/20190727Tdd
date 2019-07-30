@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Module\Budget;
 use Carbon\Carbon;
 
 class Period
@@ -19,44 +18,40 @@ class Period
     }
 
     /**
-     * @param Carbon $start
-     * @param Carbon $end
+     * @param Period $another
      * @return int
      */
-    public function days(): int
+    public function overlappingDays(Period $another)
     {
-        return $this->start->diffInDays($this->end) + 1;
-    }
-
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    public function getEnd()
-    {
-        return $this->end;
-    }
-
-    /**
-     * @param Budget $budget
-     * @return int
-     */
-    public function overlappingDays(Budget $budget)
-    {
-        if ($this->start > $budget->getLastDay() || $this->end < $budget->getFirstDay()) {
+        if ($this->hasNoOverlapping($another) || $this->invalidPeriod()) {
             return 0;
         }
 
-        $effectiveStart = ($budget->getFirstDay() > $this->start) ?
-        $budget->getFirstDay() :
-        $this->start;
+        $effectiveStart = ($another->start > $this->start) ?
+            $another->start :
+            $this->start;
 
-        $effectiveEnd = ($budget->getLastDay() < $this->end) ?
-        $budget->getLastDay() :
-        $this->end;
+        $effectiveEnd = ($another->end < $this->end) ?
+            $another->end :
+            $this->end;
 
         return $effectiveStart->diffInDays($effectiveEnd) + 1;
     }
 
+    /**
+     * @param Period $another
+     * @return bool
+     */
+    private function hasNoOverlapping(Period $another)
+    {
+        return $this->start > $another->end || $this->end < $another->start;
+    }
+
+    /**
+     * @return bool
+     */
+    private function invalidPeriod()
+    {
+        return $this->end < $this->start;
+    }
 }

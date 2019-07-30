@@ -117,6 +117,16 @@ class BudgetServiceTest extends TestCase
         $this->budgetShouldBe($budgetAmount);
     }
 
+    public function test_Period_Invalid_Period()
+    {
+        $budgetAmount = 0;
+        $this->giveStartDateAndEndDate('20190402', '20190401');
+        $this->givenBudgets([
+            ["yearMonth" => 201904, 'amount' => 30],
+        ]);
+        $this->budgetShouldBe($budgetAmount);
+    }
+
     private function giveStartDateAndEndDate(string $start, string $end)
     {
         $this->start = new Carbon($start);
@@ -131,8 +141,9 @@ class BudgetServiceTest extends TestCase
     private function givenBudgets($budgets): void
     {
         $response = [];
-        foreach ($budgets as $budget){
-            $response[] = (new Budget($budget['yearMonth'], $budget['amount']));
+
+        foreach ($budgets as $budget) {
+            $response[] = new Budget(new Carbon($budget['yearMonth'] . '01'), $budget['amount']);
         }
 
         $this->stubRepository->shouldReceive('getAll')->andReturn($response);
